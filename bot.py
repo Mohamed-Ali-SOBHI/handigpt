@@ -65,7 +65,8 @@ def recursive_fetch_content(url: str, visited_urls: set, depth: int = 1):
             for link in links:
                 if link not in visited_urls and is_allowed(link):
                     executor.submit(recursive_fetch_content, link, visited_urls, depth-1) # Appel récursif avec multi-threading pour chaque lien trouvé sur la page
-                    print(link)
+                    print(depth)
+
                     
 if __name__ == "__main__":
     visited_urls_set = set()
