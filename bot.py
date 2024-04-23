@@ -69,6 +69,6 @@ def recursive_fetch_content(url: str, visited_urls: set, depth: int = 1):
 if __name__ == "__main__":
     visited_urls_set = set()
     starting_url = "https://www.monparcourshandicap.gouv.fr/aides"  
-    recursive_fetch_content(starting_url, visited_urls_set, depth=6) # Profondeur de 2 pour l'exemple
+    recursive_fetch_content(starting_url, visited_urls_set, depth=4) # Profondeur de 2 pour l'exemple
     print(visited_urls_set)
     print(len(visited_urls_set))
