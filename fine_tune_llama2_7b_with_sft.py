@@ -83,7 +83,7 @@ training_arguments = TrainingArguments(
 # Define Trainer
 trainer = Trainer(
     model=AutoModelForCausalLM.from_pretrained(base_model),
-    args=training_args,
+    args=training_arguments,
     train_dataset=tokenized_dataset,
     tokenizer=tokenizer
 )
