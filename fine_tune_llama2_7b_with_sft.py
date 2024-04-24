@@ -46,26 +46,23 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model = prepare_model_for_kbit_training(model)
 
-# Charger les données
+# Load and prepare the dataset
 file_path = 'generated_questions.json'
 with open(file_path, 'r') as file:
     data = json.load(file)
 
-# Flatten the list of lists structure into a single list of dictionaries
+# Flatten the list of lists into a single list of dictionaries
 flat_data = [item for sublist in data for item in sublist]
 
-# Verify that each dictionary contains both 'instruction' and 'output' keys
-if not all('instruction' in entry and 'output' in entry for entry in flat_data):
-    raise ValueError("Some entries are missing 'instruction' or 'output' keys.")
+# Create dataset
+dataset = Dataset.from_dict({"texts": [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry in flat_data]})
 
-# Create pairs of instruction and output
-# Assuming tokenizer and tokenizer.eos_token are defined as part of your environment
-texts = [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry in flat_data]
+# Define a function for tokenizing
+def tokenize(examples):
+    return tokenizer(examples['texts'], truncation=True, padding="max_length", max_length=512)
 
-# Tokenization of the pairs for the model
-# Ensure the tokenizer object is properly initialized and configured as per your model's requirements
-encoded_inputs = tokenizer(texts, padding=True, truncation=True, max_length=512)
-dataset = Dataset.from_dict(encoded_inputs)
+# Apply tokenization
+tokenized_dataset = dataset.map(tokenize, batched=True)
 
 training_arguments = TrainingArguments(
     learning_rate=2e-4,
@@ -83,15 +80,12 @@ training_arguments = TrainingArguments(
     output_dir="./results",
 )
 
-trainer = SFTTrainer(
-    model=model,
-    train_dataset=dataset,
-    eval_dataset=dataset.select(range(0,20)),
-    peft_config=peft_config,
-    dataset_text_field="instruction",
-    max_seq_length=512,
-    tokenizer=tokenizer,
-    args=training_arguments,
+# Define Trainer
+trainer = Trainer(
+    model=AutoModelForCausalLM.from_pretrained(base_model),
+    args=training_args,
+    train_dataset=tokenized_dataset,
+    tokenizer=tokenizer
 )
 
 trainer.train()
