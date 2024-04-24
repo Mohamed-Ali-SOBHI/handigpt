@@ -3,6 +3,8 @@ import json
 import torch
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from huggingface_hub import HfFolder
+
 
 def clean_text(text):
     """Clean text by removing extra spaces and HTML tags."""
@@ -38,8 +40,10 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     print(f"Using device: {device}")
     
     try:
+        HfFolder.save_token('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')
         model = AutoModelForCausalLM.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1").to(device)
         tokenizer = AutoTokenizer.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1")
+        #tokenizer.pad_token = tokenizer.eos_token
         qa_pairs = []
 
         for segment in tqdm(segments[:10]):
@@ -58,10 +62,10 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     except RuntimeError as e:
         print(f"Runtime error during model operation: {e}")
 
-segments = read_and_segment_file('collected_text_data_multi_threaded.txt')
+segments = read_and_segment_file('collected_text_data_multi_threaded_1.txt')
 cleaned_and_filtered_segments = clean_and_filter_segments(segments)
 grouped_segments = group_short_segments(cleaned_and_filtered_segments)
 print(f"Number of segments before grouping: {len(cleaned_and_filtered_segments)}")
-print(f"Number of segments after grouping: {grouped_segments[-1]}")
+print(f"Number of segments after grouping: {len(grouped_segments)}")
 print(grouped_segments[-1])
 generate_questions_and_save_json(grouped_segments, 'generated_questions.json')
