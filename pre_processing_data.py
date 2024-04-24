@@ -86,7 +86,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
         model = prepare_model_for_kbit_training(model)
         qa_pairs = []
 
-        for segment in tqdm(segments):
+        for segment in tqdm(segments[:100]):
             prompt = f"""Basé sur le texte suivant, générer des questions informatives, engageantes et bien formulées en français qui pourraient être posées dans un contexte 
                         éducatif ou journalistique. Les questions doivent inciter à la réflexion et à la discussion, en explorant des aspects clés et des détails intéressants 
                         du texte. Texte : "{segment}" """
