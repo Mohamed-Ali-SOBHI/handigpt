@@ -90,8 +90,8 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
             prompt = f"""Basé sur le texte suivant, générer des questions informatives, engageantes et bien formulées en français qui pourraient être posées dans un contexte 
                         éducatif ou journalistique. Les questions doivent inciter à la réflexion et à la discussion, en explorant des aspects clés et des détails intéressants 
                         du texte. Texte : "{segment}" """
-            inputs = tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True)
-            outputs = model.generate(**inputs, max_length=512, num_return_sequences=num_questions, num_beams=5, temperature=0.9)
+            inputs = tokenizer(prompt, return_tensors="pt", max_length=64, truncation=True)
+            outputs = model.generate(**inputs, max_length=64, num_return_sequences=num_questions, num_beams=5, temperature=0.9)
             
             questions = [tokenizer.decode(ids, skip_special_tokens=True) for ids in outputs]
             qa_pairs.append([{"instruction": question, "output": segment} for question in questions])
