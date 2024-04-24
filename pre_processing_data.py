@@ -56,6 +56,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     HfFolder.save_token('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')
     
     try:
+        model = AutoModelForCausalLM.from_pretrained("alpindale/Mistral-7B-v0.2-hf").to(device)
         tokenizer = AutoTokenizer.from_pretrained("alpindale/Mistral-7B-v0.2-hf")
         tokenizer.pad_token = tokenizer.eos_token
         # QLoRA config
@@ -65,7 +66,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
             bnb_4bit_compute_dtype=torch.float16,
             bnb_4bit_use_double_quant=True,
         )
-        
+
         # LoRA config
         peft_config = LoraConfig(
             r=16,
