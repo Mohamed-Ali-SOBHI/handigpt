@@ -49,9 +49,15 @@ model = prepare_model_for_kbit_training(model)
 file_path = 'generated_questions.json'
 with open(file_path, 'r') as file:
     data = json.load(file)
-texts = [entry['instruction'] for entry in data]
 
-# Préparation des données pour le modèle
+# Vérifier que chaque entrée contient les clés 'instruction' et 'output'
+if not all('instruction' in entry and 'output' in entry for entry in data):
+    raise ValueError("Some entries are missing 'instruction' or 'output' keys.")
+
+# Créer des paires d'instruction et de sortie
+texts = [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry in data]
+
+# Tokenisation des paires pour le modèle
 encoded_inputs = tokenizer(texts, padding=True, truncation=True, max_length=512)
 dataset = Dataset.from_dict(encoded_inputs)
 
