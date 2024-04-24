@@ -9,6 +9,15 @@ from transformers import (
     TrainingArguments,
     pipeline,
 )
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    TrainingArguments,
+    pipeline,
+)
+from trl import SFTTrainer
 from huggingface_hub import HfFolder
 
 
@@ -47,9 +56,33 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     HfFolder.save_token('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')
     
     try:
-        model = AutoModelForCausalLM.from_pretrained("alpindale/Mistral-7B-v0.2-hf").to(device)
         tokenizer = AutoTokenizer.from_pretrained("alpindale/Mistral-7B-v0.2-hf")
         tokenizer.pad_token = tokenizer.eos_token
+        # QLoRA config
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+        )
+        
+        # LoRA config
+        peft_config = LoraConfig(
+            r=16,
+            lora_alpha=32,
+            lora_dropout=0.05,
+            bias="none",
+            task_type="CAUSAL_LM",
+            target_modules=['up_proj', 'down_proj', 'gate_proj', 'k_proj', 'q_proj', 'v_proj', 'o_proj']
+        )
+
+        # Load model
+        model = AutoModelForCausalLM.from_pretrained(
+            model,
+            quantization_config=bnb_config,
+            device_map="auto",
+        )
+        model = prepare_model_for_kbit_training(model)
         qa_pairs = []
 
         for segment in tqdm(segments[:10]):
