@@ -1,29 +1,25 @@
 import gc
-import os
+import json
 import torch
-from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
-    pipeline,
+    Trainer
 )
-from trl import SFTTrainer
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
 
+# Chargement du modèle de base et configuration initiale
 base_model = "NousResearch/Llama-2-7b-chat-hf"
 new_model = "NousResearch/Llama-2-7b-chat-hf-handigpt"
-
-"""## Fine-tuning Mistral-8x7b"""
-
-# Insert your dataset here
-dataset = None
 
 # Tokenizer
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 tokenizer.pad_token = tokenizer.eos_token
 
-# QLoRA config
+# Configuration de BitsAndBytes pour la quantification
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
@@ -31,7 +27,7 @@ bnb_config = BitsAndBytesConfig(
     bnb_4bit_use_double_quant=True,
 )
 
-# LoRA config
+# Configuration de LoRA pour l'ajustement des paramètres
 peft_config = LoraConfig(
     r=16,
     lora_alpha=32,
@@ -41,7 +37,7 @@ peft_config = LoraConfig(
     target_modules=['up_proj', 'down_proj', 'gate_proj', 'k_proj', 'q_proj', 'v_proj', 'o_proj']
 )
 
-# Load model
+# Chargement du modèle avec la configuration de quantification
 model = AutoModelForCausalLM.from_pretrained(
     base_model,
     quantization_config=bnb_config,
@@ -49,6 +45,17 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model = prepare_model_for_kbit_training(model)
 
+# Charger les données
+file_path = 'generated_questions.json'
+with open(file_path, 'r') as file:
+    data = json.load(file)
+texts = [entry['instruction'] for entry in data]
+
+# Préparation des données pour le modèle
+encoded_inputs = tokenizer(texts, padding=True, truncation=True, max_length=512)
+dataset = Dataset.from_dict(encoded_inputs)
+
+# Configuration des arguments de training
 training_arguments = TrainingArguments(
     learning_rate=2e-4,
     lr_scheduler_type="linear",
@@ -64,21 +71,19 @@ training_arguments = TrainingArguments(
     output_dir="./results",
 )
 
-trainer = SFTTrainer(
+# Configuration du Trainer pour le fine-tuning
+trainer = Trainer(
     model=model,
-    train_dataset=dataset,
-    eval_dataset=dataset.select(range(100)),
-    peft_config=peft_config,
-    dataset_text_field="instruction",
-    max_seq_length=512,
-    tokenizer=tokenizer,
     args=training_arguments,
+    train_dataset=dataset,
+    eval_dataset=dataset.select(range(1)),  # Sélectionner une partie pour l'évaluation
+    tokenizer=tokenizer
 )
 
+# Lancement du fine-tuning
 trainer.train()
 
-"""Merging the base model with the trained adapter."""
-# Flush memory
+# Nettoyage et sauvegarde du modèle
 del trainer, model
 gc.collect()
 torch.cuda.empty_cache()
@@ -93,18 +98,10 @@ model = AutoModelForCausalLM.from_pretrained(
 model = PeftModel.from_pretrained(model, new_model)
 model = model.merge_and_unload()
 
-# Reload tokenizer to save it
+# Recharger le tokenizer pour la sauvegarde
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.unk_token
 
-# Save model
+# Sauvegarde du modèle et du tokenizer
 model.save_pretrained(new_model)
 tokenizer.save_pretrained(new_model)
-
-"""## Going further
-
-* **DPO fine-tuning**: see [this article](https://mlabonne.github.io/blog/posts/Fine_tune_Mistral_7b_with_DPO.html)
-* **Better fine-tuning tool**: see [Axolotl](https://mlabonne.github.io/blog/posts/A_Beginners_Guide_to_LLM_Finetuning.html)
-* **Evaluation**: see the [LM Evaluation Harness](https://github.com/EleutherAI/lm-evaluation-harness) and the [Open LLM Leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard)
-* **Quantization**: see [naive quantization](https://mlabonne.github.io/blog/posts/Introduction_to_Weight_Quantization.html), [GPTQ](https://mlabonne.github.io/blog/posts/4_bit_Quantization_with_GPTQ.html), [GGUF/llama.cpp](https://mlabonne.github.io/blog/posts/Quantize_Llama_2_models_using_ggml.html), ExLlamav2, and AWQ.
-"""
