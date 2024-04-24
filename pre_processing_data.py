@@ -62,7 +62,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     except RuntimeError as e:
         print(f"Runtime error during model operation: {e}")
 
-segments = read_and_segment_file('collected_text_data_multi_threaded_1.txt')
+segments = read_and_segment_file('collected_text_data_multi_threaded.txt')
 cleaned_and_filtered_segments = clean_and_filter_segments(segments)
 grouped_segments = group_short_segments(cleaned_and_filtered_segments)
 print(f"Number of segments before grouping: {len(cleaned_and_filtered_segments)}")
