@@ -38,7 +38,7 @@ def group_short_segments(segments, min_length=20):
 def generate_questions_and_save_json(segments, output_file, num_questions=3):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
-    HfFolder.save_token('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')
+    HfFolder.set_token('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')
     
     try:
         model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2").to(device)
