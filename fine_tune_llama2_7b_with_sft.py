@@ -49,16 +49,20 @@ model = prepare_model_for_kbit_training(model)
 file_path = 'generated_questions.json'
 with open(file_path, 'r') as file:
     data = json.load(file)
-    data = data[0][0]
-    
-# Vérifier que chaque entrée contient les clés 'instruction' et 'output'
-if not all('instruction' in entry and 'output' in entry for entry in data):
+
+# Flatten the list of lists structure into a single list of dictionaries
+flat_data = [item for sublist in data for item in sublist]
+
+# Verify that each dictionary contains both 'instruction' and 'output' keys
+if not all('instruction' in entry and 'output' in entry for entry in flat_data):
     raise ValueError("Some entries are missing 'instruction' or 'output' keys.")
 
-# Créer des paires d'instruction et de sortie
-texts = [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry in data]
+# Create pairs of instruction and output
+# Assuming tokenizer and tokenizer.eos_token are defined as part of your environment
+texts = [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry in flat_data]
 
-# Tokenisation des paires pour le modèle
+# Tokenization of the pairs for the model
+# Ensure the tokenizer object is properly initialized and configured as per your model's requirements
 encoded_inputs = tokenizer(texts, padding=True, truncation=True, max_length=512)
 dataset = Dataset.from_dict(encoded_inputs)
 
