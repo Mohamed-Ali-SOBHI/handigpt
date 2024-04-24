@@ -49,7 +49,8 @@ model = prepare_model_for_kbit_training(model)
 file_path = 'generated_questions.json'
 with open(file_path, 'r') as file:
     data = json.load(file)
-
+    data = data[0][0]
+    
 # Vérifier que chaque entrée contient les clés 'instruction' et 'output'
 if not all('instruction' in entry and 'output' in entry for entry in data):
     raise ValueError("Some entries are missing 'instruction' or 'output' keys.")
