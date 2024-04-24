@@ -56,7 +56,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     HfFolder.save_token('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')
     
     try:
-        base_model = "alpindale/Mistral-7B-v0.2-hf"
+        base_model = "NousResearch/Llama-2-7b-chat-hf"
         tokenizer = AutoTokenizer.from_pretrained(base_model)
         tokenizer.pad_token = tokenizer.eos_token
         # QLoRA config
