@@ -43,7 +43,7 @@ def generate_questions_and_save_json(segments, output_file, num_questions=3):
     try:
         model = AutoModelForCausalLM.from_pretrained("alpindale/Mistral-7B-v0.2-hf").to(device)
         tokenizer = AutoTokenizer.from_pretrained("alpindale/Mistral-7B-v0.2-hf")
-        #tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.pad_token = tokenizer.eos_token
         qa_pairs = []
 
         for segment in tqdm(segments[:10]):
