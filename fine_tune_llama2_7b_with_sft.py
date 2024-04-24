@@ -10,6 +10,7 @@ from transformers import (
     Trainer
 )
 from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
+from trl import SFTTrainer
 
 # Chargement du modèle de base et configuration initiale
 base_model = "NousResearch/Llama-2-7b-chat-hf"
@@ -66,11 +67,10 @@ texts = [entry['instruction'] + tokenizer.eos_token + entry['output'] for entry 
 encoded_inputs = tokenizer(texts, padding=True, truncation=True, max_length=512)
 dataset = Dataset.from_dict(encoded_inputs)
 
-# Configuration des arguments de training
 training_arguments = TrainingArguments(
     learning_rate=2e-4,
     lr_scheduler_type="linear",
-    num_train_epochs=10,
+    num_train_epochs=3,
     per_device_train_batch_size=10,
     per_device_eval_batch_size=10,
     gradient_accumulation_steps=1,
@@ -79,20 +79,25 @@ training_arguments = TrainingArguments(
     logging_steps=1,
     optim="paged_adamw_8bit",
     warmup_steps=10,
+    report_to="wandb",
     output_dir="./results",
 )
 
-# Configuration du Trainer pour le fine-tuning
-trainer = Trainer(
+trainer = SFTTrainer(
     model=model,
-    args=training_arguments,
     train_dataset=dataset,
-    eval_dataset=dataset.select(range(1)),  # Sélectionner une partie pour l'évaluation
-    tokenizer=tokenizer
+    eval_dataset=dataset.select(range(0,20)),
+    peft_config=peft_config,
+    dataset_text_field="instruction",
+    max_seq_length=512,
+    tokenizer=tokenizer,
+    args=training_arguments,
 )
 
-# Lancement du fine-tuning
 trainer.train()
+
+trainer.model.save_pretrained(new_model)
+tokenizer.save_pretrained(new_model)
 
 # Nettoyage et sauvegarde du modèle
 del trainer, model
