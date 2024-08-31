@@ -20,7 +20,7 @@ clearButton.addEventListener('click', () => {
 
 async function generateResponse(userMessage) {
     const openaiUrl = "https://api.openai.com/v1/chat/completions";  // OpenAI endpoint for chat completions
-    const apiKey = 'sk-proj-F1l4Q9l7OZRo1WvZzkI2T3BlbkFJCuTXkY7K6KEpJbd0zFW5';  // Securely stored API key in environment variables
+    const apiKey = ''
 
     messagehistory.push({role: 'user', content: userMessage});  // Add user message to history
 
