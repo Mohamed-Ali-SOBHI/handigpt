@@ -4,7 +4,6 @@ const speechButton = document.getElementById('speech-button');
 const chatMessage = document.getElementById('chat-message');
 const clearButton = document.getElementById('clear-button');
 let messagehistory = [];   // Added message history array
-const apiKey = 'sk-proj-F1l4Q9l7OZRo1WvZzkI2T3BlbkFJCuTXkY7K6KEpJbd0zFW5';
 
 sendButton.addEventListener('click', async () => {
     const userMessage = userInput.value;
