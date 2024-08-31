@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat avec un modèle LLM</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-black text-white  overflow-hidden">
+    <div class="container mx-auto h-full flex justify-center items-center">
+        <div class="chat-container w-full max-w-2xl bg-black shadow-lg rounded-lg p-6">
+            <div class="chat-header flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-white">Handi GPT</h1>
+                <button class="focus:outline-none" id="clear-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-message space-y-4 overflow-y-auto" id="chat-message">
+                <!-- Les messages seront insérés ici -->
+            </div>
+            <div class="chat-input flex justify-between items-center mt-6">
+                <div class="relative flex-grow">
+                    <input type="text" id="user-input" placeholder="Tapez votre message..." class="w-full pl-3 pr-16 border border-gray-700 rounded-full text-white bg-black focus:outline-none focus:border-blue-500">
+                    <button class="absolute inset-y-0 right-0 flex items-center px-4 text-white rounded-full bg-blue-500" id="send-button">
+                        <!-- Icône FontAwesome d'envoi -->
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <button class="ml-2 bg-gray-700 text-gray-300 p-2 rounded-full focus:outline-none" id="speech-button">
+                    <!-- Icône FontAwesome de microphone -->
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>     
+            <div id="disclaimer" class="chat-input flex justify-between items-center mt-6">
+                <p class="text-center text-gray-400 text-sm mt-4">Ce chatbot est basé sur un modèle de langage et a été formé sur des données publiques. Il peut ne pas être parfait et peut donner des réponses incorrectes.</p>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

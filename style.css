@@ -1,0 +1,141 @@
+/* Increase the size of the input field */
+#user-input {
+    height: 3rem; /* Larger height for the input */
+    padding-top: 0.5rem; /* Adjust the top padding to center the text */
+    padding-bottom: 0.5rem; /* Adjust the bottom padding to center the text */
+}
+
+#send-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border: none; /* Remove default border */
+    border-radius: 9999px; /* Fully rounded borders for the right part */
+}
+
+/* Adjust the microphone button size and alignment */
+#speech-button {
+    height: 3rem; /* Match the height of the input field */
+    width: 3rem; /* Make it a square shape, can adjust as needed */
+    border-radius: 50%; /* Make it round */
+    margin-left: 0.5rem; /* Space from the send button */
+    outline: none; /* Remove the focus outline */
+    border: none; /* Remove the border */
+    background-color: #007BFF; /* Example blue color, match this to your design */
+    color: white; /* Icon color */
+    display: flex; /* To center the icon */
+    align-items: center; /* Center align vertically */
+    justify-content: center; /* Center align horizontally */
+}
+
+/* Update icon size */
+#speech-button i {
+    font-size: 1.5rem; /* Larger font size for the icon */
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* This will push the footer down */
+    height: 100vh; /* This makes sure the container takes full viewport height */
+}
+
+/* Make the chat message container grow to fill available space, pushing input and disclaimer down */
+#chat-message {
+    flex-grow: 1; /* This will allow it to expand and fill the space */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Ensure the input area does not grow and is always visible */
+.chat-input {
+    flex-shrink: 0; /* Prevents this area from shrinking */
+    margin-top: auto; /* Pushes the input area to the bottom */
+}
+
+body {
+    height: 100vh;
+    overflow: hidden; /* No scrolling on the body itself */
+}
+
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.message.user {
+    background-color: #007BFF; 
+    align-self: flex-end;
+    margin-left: auto; /* Pushes the message to the right */
+    margin-right: 10px;
+}
+
+.message.model {
+    background-color: gray; 
+    align-self: flex-start;
+    margin-right: auto; /* Pushes the message to the left */
+    margin-left: 10px;
+}
+
+.message.model .text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.disclaimer {
+    margin-top: auto; /* Pushes the disclaimer to the bottom */
+}
+
+.sender {
+    font-weight: bold;
+}
+
+.speech-button {
+    margin-left: 10px;
+}
+
+/* Ajout d'animations */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: transform 0.5s;
+}
+
+.slide-up-enter,
+.slide-up-leave-to {
+    transform: translateY(100%);
+}
+
+/* Styles généraux pour la barre de défilement */
+#user-input::-webkit-scrollbar {
+    width: 12px; /* Largeur de la barre de défilement */
+    background-color: #000; /* Couleur de fond de la barre de défilement */
+}
+
+#user-input::-webkit-scrollbar-track {
+    background-color: #000; /* Couleur de fond du chemin de la barre de défilement */
+}
+
+#user-input::-webkit-scrollbar-thumb {
+    background-color: #555; /* Couleur du pouce de la barre de défilement */
+    border-radius: 6px; /* Arrondi du pouce pour un look plus doux */
+    border: 3px solid #000; /* Bordure pour que le pouce ne touche pas directement les bords */
+}
+
+/* Pour Firefox */
+#user-input {
+    scrollbar-width: thin; /* 'auto' ou 'thin' */
+    scrollbar-color: #555 #000; /* Couleur du pouce et du chemin */
+}
